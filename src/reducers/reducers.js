@@ -1,5 +1,4 @@
 
-
 exports.alreadyAskedReducer = (state=[], action) => {
     switch(action.type) {
         case "ADD_ONE":
@@ -8,7 +7,6 @@ exports.alreadyAskedReducer = (state=[], action) => {
         return state;
     }
 }
-
 
 exports.roundReducer = (state=1, action) => {
     switch(action.type) {
