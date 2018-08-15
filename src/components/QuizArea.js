@@ -55,7 +55,7 @@ class QuizArea extends Component {
         if(!localStorage.getItem("highScore")) {
             localStorage.setItem("highScore", generalScore + currentRoundScore);
         }
-        else if (localStorage.getItem("highScore") < generalScore) {
+        else if (localStorage.getItem("highScore") < generalScore + currentRoundScore) {
             localStorage.setItem("highScore", generalScore + currentRoundScore);
         }
     }
@@ -63,11 +63,11 @@ class QuizArea extends Component {
     handleSubmitAnswer() {
         let { questionData, userAnswer, gameOver } = this.state;
         let { action, round, generalScore, currentRoundScore } = this.props;
-        // Cleans the answer from possible html tags
-        let correctAnswer = questionData.answer.replace(/(<([^>]+)>)/ig,"");
+        // Cleans the answer from possible html tags and \
+         let correctAnswer = questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"");
         if(userAnswer.toLowerCase() == correctAnswer.toLowerCase()) {
             action.addScore(currentRoundScore);
-            if (round < 3) {
+            if (round < 6) {
                 action.nextRound();
                 action.increaseScore(Math.pow(2, round));
                 this.getTheQuestion();
@@ -86,6 +86,7 @@ class QuizArea extends Component {
 
     startNewGame() {
         console.log("start new");
+        window.location.reload();
     }
 
     countDown() {

@@ -6,7 +6,7 @@ const GameOverModal = (props) => {
         <div className="modal">
             <div className="modal-content">
                 <h3>{props.youWon ? "YOU WON!" : "GAME OVER"}</h3>
-                <button className="new-game-button"> Start Over</button>
+                <button className="new-game-button" onClick={props.startNewGame}> Start Over</button>
             </div>
         </div>
     )
