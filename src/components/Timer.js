@@ -1,10 +1,7 @@
 import React, {Component} from 'react';
-import '../App.css';
+import '../styles/App.css';
 
 class Timer extends Component {
-    constructor(props) {
-        super(props);
-    }
 
     componentDidMount() {
         this.interval = setInterval(this.props.countDown, 1000);
@@ -12,7 +9,7 @@ class Timer extends Component {
 
     render() {
         return (
-            <h3>{this.props.secondsLeft}</h3>
+            <div className="timer-circle">{this.props.secondsLeft}</div>
         )
     }
 }

@@ -1,13 +1,12 @@
 import React from 'react';
-import './App.css';
+import './styles/App.css';
 import QuizArea from './components/QuizArea';
-
 
 
 const App = () => {
     return (
-      <div className="App">
-          <h1 className="App-title">Welcome to the Trivia Game</h1>
+      <div className="app">
+          <h1 className="app-title">Welcome to the Trivia Game</h1>
           <QuizArea/>
       </div>
     );

@@ -7,7 +7,7 @@ const rootReducer = combineReducers({
     alreadyAsked: alreadyAskedReducer,
     round: roundReducer,
     generalScore: generalScoreReducer,
-    currentRoundScore: currentRoundScoreReducer
+    currentRoundScore: currentRoundScoreReducer,
 })
 
 

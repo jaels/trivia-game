@@ -1,4 +1,5 @@
 
+
 exports.alreadyAskedReducer = (state=[], action) => {
     switch(action.type) {
         case "ADD_ONE":

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../App.css';
+import '../styles/App.css';
 import Timer from "./Timer";
 import GameOverModal from "./GameOverModal";
 import GeneralInfo from "./GeneralInfo";
@@ -21,7 +21,7 @@ class QuizArea extends Component {
         this.answerArea = React.createRef();
         this.countDown = this.countDown.bind(this);
         this.handleGameOver = this.handleGameOver.bind(this);
-
+        this.handleCorrectAnswer = this.handleCorrectAnswer.bind(this);
     }
 
     componentDidMount() {
@@ -40,17 +40,54 @@ class QuizArea extends Component {
                 else {
                     this.setState({questionData: data[0]})
                     action.addAlreadyAsked(data[0].id);
+                    this.setState({secondsLeft: 30});
                 }
             });
         });
+    }
+
+    countDown() {
+        const { secondsLeft } = this.state;
+        this.setState({secondsLeft: secondsLeft -1});
+        if (secondsLeft === 1) {
+          clearInterval(this.interval);
+          this.setState({gameOver: true});
+        }
     }
 
     handleAnswerTyping(e) {
         this.setState({userAnswer: e.target.value});
     }
 
+    handleSubmitAnswer() {
+        const { questionData, userAnswer } = this.state;
+        // Cleans the answer from possible html tags and \
+         const correctAnswer = questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"");
+        if(userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+            this.handleCorrectAnswer();
+        }
+        else {
+            this.handleGameOver();
+        }
+    }
+
+    handleCorrectAnswer() {
+        const { action, round, currentRoundScore } = this.props;
+        action.addScore(currentRoundScore);
+        if (round < 30) {
+            action.nextRound();
+            action.increaseScore(Math.pow(2, round));
+            this.answerArea.current.value = "";
+            this.getTheQuestion();
+        }
+        else {
+            this.setState({youWon: true});
+            this.handleGameOver();
+        }
+    }
+
     handleGameOver() {
-        let { generalScore, currentRoundScore } = this.props;
+        const { generalScore, currentRoundScore } = this.props;
         this.setState({gameOver: true});
         if(!localStorage.getItem("highScore")) {
             localStorage.setItem("highScore", generalScore + currentRoundScore);
@@ -60,58 +97,25 @@ class QuizArea extends Component {
         }
     }
 
-    handleSubmitAnswer() {
-        let { questionData, userAnswer, gameOver } = this.state;
-        let { action, round, generalScore, currentRoundScore } = this.props;
-        // Cleans the answer from possible html tags and \
-         let correctAnswer = questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"");
-        if(userAnswer.toLowerCase() == correctAnswer.toLowerCase()) {
-            action.addScore(currentRoundScore);
-            if (round < 6) {
-                action.nextRound();
-                action.increaseScore(Math.pow(2, round));
-                this.getTheQuestion();
-                this.answerArea.current.value = "";
-                this.setState({secondsLeft: 30});
-            }
-            else {
-                this.setState({youWon: true});
-                this.handleGameOver();
-            }
-        }
-        else {
-            this.handleGameOver();
-        }
-    }
-
     startNewGame() {
-        console.log("start new");
         window.location.reload();
     }
 
-    countDown() {
-    let { secondsLeft } = this.state;
-    this.setState({secondsLeft: secondsLeft -1});
-    if (secondsLeft == 1) {
-      clearInterval(this.interval);
-      this.setState({gameOver: true});
-    }
-  }
-
   render() {
-     let { questionData, gameOver, youWon } = this.state;
+     const { questionData, gameOver, youWon } = this.state;
      return (
-      <div className="questionArea">
-      {gameOver ? <GameOverModal youWon={youWon} startNewGame={this.startNewGame}/> : ""}
-      <GeneralInfo/>
-        {!gameOver ? <Timer countDown={this.countDown} secondsLeft={this.state.secondsLeft}/>  : ""}
-          <h1 className="question">Please answer the following question:</h1>
-          <h4>{questionData ? questionData.category.title : "" }</h4>
-          <h3>{questionData ? questionData.question : ""}</h3>
-          <textarea rows="4" cols="50" onChange={this.handleAnswerTyping.bind(this)} ref={this.answerArea}>
-          </textarea>
-          <button className="submit-button" onClick={this.handleSubmitAnswer.bind(this)}>Submit</button>
-      </div>
+       <div className="questionArea">
+         {gameOver ?
+         <GameOverModal youWon={youWon} startNewGame={this.startNewGame}/> : ""}
+         <GeneralInfo/> {!gameOver ?
+         <Timer countDown={this.countDown} secondsLeft={this.state.secondsLeft}/> : ""}
+         <h2 className="question">Please answer the following question:</h2>
+         <h3>{questionData ? questionData.category.title : "" }</h3>
+         <h2>{questionData ? questionData.question : ""}</h2>
+         <textarea rows="4" cols="50" className="answer-area" onChange={this.handleAnswerTyping.bind(this)} ref={this.answerArea}>
+         </textarea>
+         <button className="submit-button" onClick={this.handleSubmitAnswer.bind(this)}>Submit</button>
+       </div>
     );
   }
 }
