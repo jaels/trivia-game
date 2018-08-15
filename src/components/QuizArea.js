@@ -16,12 +16,14 @@ class QuizArea extends Component {
             userAnswer: "",
             gameOver: false,
             youWon: false,
-            secondsLeft: 30
+            secondsLeft: 30,
+            maxNumOfQuestions: 30
         }
+
         this.answerArea = React.createRef();
-        this.countDown = this.countDown.bind(this);
         this.handleGameOver = this.handleGameOver.bind(this);
         this.handleCorrectAnswer = this.handleCorrectAnswer.bind(this);
+        this.startNewGame = this.startNewGame.bind(this);
     }
 
     componentDidMount() {
@@ -46,15 +48,6 @@ class QuizArea extends Component {
         });
     }
 
-    countDown() {
-        const { secondsLeft } = this.state;
-        this.setState({secondsLeft: secondsLeft -1});
-        if (secondsLeft === 1) {
-          clearInterval(this.interval);
-          this.setState({gameOver: true});
-        }
-    }
-
     handleAnswerTyping(e) {
         this.setState({userAnswer: e.target.value});
     }
@@ -62,7 +55,7 @@ class QuizArea extends Component {
     handleSubmitAnswer() {
         const { questionData, userAnswer } = this.state;
         // Cleans the answer from possible html tags and \
-         const correctAnswer = questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"");
+        const correctAnswer = questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"");
         if(userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
             this.handleCorrectAnswer();
         }
@@ -73,18 +66,22 @@ class QuizArea extends Component {
 
     handleCorrectAnswer() {
         const { action, round, currentRoundScore } = this.props;
+        const { maxNumOfQuestions } = this.state;
         action.addScore(currentRoundScore);
-        if (round < 30) {
+        if (round < maxNumOfQuestions) {
             action.nextRound();
-            action.increaseScore(Math.pow(2, round));
+            action.increasePotentialScore(Math.pow(2, round));
             this.answerArea.current.value = "";
             this.getTheQuestion();
+            this.setState({secondsLeft: 30});
         }
         else {
             this.setState({youWon: true});
             this.handleGameOver();
         }
     }
+
+
 
     handleGameOver() {
         const { generalScore, currentRoundScore } = this.props;
@@ -98,7 +95,10 @@ class QuizArea extends Component {
     }
 
     startNewGame() {
-        window.location.reload();
+        const { action } = this.props;
+        action.newGame();
+        this.setState({gameOver: false, secondsLeft: 30});
+        this.answerArea.current.value = "";
     }
 
   render() {
@@ -107,8 +107,9 @@ class QuizArea extends Component {
        <div className="questionArea">
          {gameOver ?
          <GameOverModal youWon={youWon} startNewGame={this.startNewGame}/> : ""}
-         <GeneralInfo/> {!gameOver ?
-         <Timer countDown={this.countDown} secondsLeft={this.state.secondsLeft}/> : ""}
+         <GeneralInfo/>
+         {!gameOver ?
+         <Timer handleGameOver={this.handleGameOver} secondsLeft={this.state.secondsLeft}/> : null}
          <h2 className="question">Please answer the following question:</h2>
          <h3>{questionData ? questionData.category.title : "" }</h3>
          <h2>{questionData ? questionData.question : ""}</h2>

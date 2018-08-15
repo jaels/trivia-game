@@ -14,7 +14,12 @@ export var addScore = (item) => ({
     item
 })
 
-export var increaseScore = (item) => ({
+export var increasePotentialScore = (item) => ({
     type: "INCREASE_SCORE",
     item
+})
+
+
+export var newGame = () => ({
+    type: "NEW_GAME"
 })

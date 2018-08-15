@@ -2,13 +2,13 @@ import { alreadyAskedReducer, roundReducer, generalScoreReducer, currentRoundSco
 
 import { combineReducers } from "redux";
 
+const rootReducer =
+  (state, action) =>
+  combineReducers({
+      alreadyAsked: alreadyAskedReducer,
+      round: roundReducer,
+      generalScore: generalScoreReducer,
+      currentRoundScore: currentRoundScoreReducer
+  })(action.type === 'NEW_GAME' ? undefined : state, action)
 
-const rootReducer = combineReducers({
-    alreadyAsked: alreadyAskedReducer,
-    round: roundReducer,
-    generalScore: generalScoreReducer,
-    currentRoundScore: currentRoundScoreReducer,
-})
-
-
-export default rootReducer;
+  export default rootReducer;
