@@ -3,17 +3,12 @@ import '../App.css';
 
 const GameOverModal = (props) => {
     return (
-        <div className="backdrop">
         <div className="modal">
-          <h2>Modal</h2>
-
-          <div className="footer">
-            <button>
-              Close
-            </button>
-          </div>
+            <div className="modal-content">
+                <h3>{props.youWon ? "YOU WON!" : "GAME OVER"}</h3>
+                <button className="new-game-button"> Start Over</button>
+            </div>
         </div>
-      </div>
     )
 }
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import '../App.css';
 import Timer from "./Timer";
 import GameOverModal from "./GameOverModal";
-
+import GeneralInfo from "./GeneralInfo";
 
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -16,9 +16,12 @@ class QuizArea extends Component {
             userAnswer: "",
             gameOver: false,
             youWon: false,
-            restartTimer: false
+            secondsLeft: 30
         }
         this.answerArea = React.createRef();
+        this.countDown = this.countDown.bind(this);
+        this.handleGameOver = this.handleGameOver.bind(this);
+
     }
 
     componentDidMount() {
@@ -30,6 +33,7 @@ class QuizArea extends Component {
         fetch("http://jservice.io/api/random").then(res => {
             res.json().then(data => {
                 console.log(data[0]);
+                //checking if the question was already asked
                 if(alreadyAsked.indexOf(data[0].id) > -1) {
                     this.getTheQuestion();
                 }
@@ -45,27 +49,38 @@ class QuizArea extends Component {
         this.setState({userAnswer: e.target.value});
     }
 
+    handleGameOver() {
+        let { generalScore, currentRoundScore } = this.props;
+        this.setState({gameOver: true});
+        if(!localStorage.getItem("highScore")) {
+            localStorage.setItem("highScore", generalScore + currentRoundScore);
+        }
+        else if (localStorage.getItem("highScore") < generalScore) {
+            localStorage.setItem("highScore", generalScore + currentRoundScore);
+        }
+    }
+
     handleSubmitAnswer() {
         let { questionData, userAnswer, gameOver } = this.state;
-        let { action, round } = this.props;
-        // In case the answer comes with <i> or other html tags, or with \
-        let correctAnswer = questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"");
-        console.log(correctAnswer);
-        if(userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
-            if (round < 30) {
+        let { action, round, generalScore, currentRoundScore } = this.props;
+        // Cleans the answer from possible html tags
+        let correctAnswer = questionData.answer.replace(/(<([^>]+)>)/ig,"");
+        if(userAnswer.toLowerCase() == correctAnswer.toLowerCase()) {
+            action.addScore(currentRoundScore);
+            if (round < 3) {
                 action.nextRound();
-                action.addScore(Math.pow(2, round - 1));
+                action.increaseScore(Math.pow(2, round));
                 this.getTheQuestion();
                 this.answerArea.current.value = "";
-                this.setState({restartTimer: true});
+                this.setState({secondsLeft: 30});
             }
             else {
-                console.log("you won");
+                this.setState({youWon: true});
+                this.handleGameOver();
             }
         }
         else {
-            console.log("game over");
-            this.setState({gameOver: true});
+            this.handleGameOver();
         }
     }
 
@@ -73,17 +88,22 @@ class QuizArea extends Component {
         console.log("start new");
     }
 
+    countDown() {
+    let { secondsLeft } = this.state;
+    this.setState({secondsLeft: secondsLeft -1});
+    if (secondsLeft == 1) {
+      clearInterval(this.interval);
+      this.setState({gameOver: true});
+    }
+  }
 
   render() {
      let { questionData, gameOver, youWon } = this.state;
-     let { round, generalScore } = this.props;
      return (
       <div className="questionArea">
-        <h2>Round: {round}</h2>
-        <h2> Total Score: {generalScore} </h2>
-        <h2> Current Round Score: {Math.pow(2, round - 1)}</h2>
-        <Timer restartTimer={this.state.restartTimer}/>
-        {gameOver ? <GameOverModal youWon={youWon} startNewGame={this.startNewGame}/> : "" }
+      {gameOver ? <GameOverModal youWon={youWon} startNewGame={this.startNewGame}/> : ""}
+      <GeneralInfo/>
+        {!gameOver ? <Timer countDown={this.countDown} secondsLeft={this.state.secondsLeft}/>  : ""}
           <h1 className="question">Please answer the following question:</h1>
           <h4>{questionData ? questionData.category.title : "" }</h4>
           <h3>{questionData ? questionData.question : ""}</h3>
@@ -100,7 +120,8 @@ function mapStateToProps(state, prop) {
     return {
         alreadyAsked: state.alreadyAsked,
         round: state.round,
-        generalScore: state.generalScore
+        generalScore: state.generalScore,
+        currentRoundScore: state.currentRoundScore
     }
 }
 

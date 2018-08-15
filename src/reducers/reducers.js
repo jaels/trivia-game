@@ -25,3 +25,12 @@ exports.generalScoreReducer = (state=0, action) => {
         return state;
     }
 }
+
+exports.currentRoundScoreReducer = (state=1, action) => {
+    switch(action.type) {
+        case "INCREASE_SCORE":
+        return action.item;
+        default:
+        return state;
+    }
+}

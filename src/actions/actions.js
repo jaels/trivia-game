@@ -13,3 +13,8 @@ export var addScore = (item) => ({
     type: "ADD_SCORE",
     item
 })
+
+export var increaseScore = (item) => ({
+    type: "INCREASE_SCORE",
+    item
+})
