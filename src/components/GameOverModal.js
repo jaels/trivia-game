@@ -6,10 +6,11 @@ const GameOverModal = (props) => {
     return (
         <div className="modal">
             <div className="modal-content">
-                {props.wrongAnswer ?
-                    <h3 style={{color: "#B00000"}}>
-                        Wrong! The correct answer is: {props.questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"")}</h3>
-                        : null}
+                <h3 style={{color: "#B00000"}}>
+                    {props.wrongAnswer ?
+                    `Wrong! The correct answer is: ${props.questionData.answer.replace(/(<([^>]+)>)|"\\"/ig,"")}`
+                    : null}
+                </h3>
                 <h3>{props.youWon ? "YOU WON!" : "GAME OVER"}</h3>
                 <button className="new-game-button" onClick={props.startNewGame}> Start Over </button>
             </div>
