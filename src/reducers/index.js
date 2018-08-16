@@ -1,5 +1,4 @@
 import { questionReducer, alreadyAskedReducer, roundReducer, generalScoreReducer, currentRoundScoreReducer, youWonReducer, wrongAnswerReducer } from "./reducers";
-
 import { combineReducers } from "redux";
 
 const rootReducer =

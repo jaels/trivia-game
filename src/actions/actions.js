@@ -1,5 +1,3 @@
-
-
 export var setQuestion = (item) => ({
     type: "SET_QUESTION",
     item

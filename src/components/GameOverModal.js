@@ -1,6 +1,5 @@
 import React from 'react';
 import '../styles/App.css';
-
 import {connect} from "react-redux";
 
 const GameOverModal = (props) => {

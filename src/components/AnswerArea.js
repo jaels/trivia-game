@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import '../styles/App.css';
-
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as actions from "../actions/actions";

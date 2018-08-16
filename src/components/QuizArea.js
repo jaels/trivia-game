@@ -4,7 +4,6 @@ import GeneralInfo from "./GeneralInfo";
 import Question from "./Question";
 import AnswerArea from "./AnswerArea";
 import GameOverModal from "./GameOverModal";
-
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as actions from "../actions/actions";

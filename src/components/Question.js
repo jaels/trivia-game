@@ -1,8 +1,6 @@
 import React from 'react';
 import '../styles/App.css';
-
 import {connect} from "react-redux";
-
 
 const Question = (props) => {
     return (
@@ -14,12 +12,10 @@ const Question = (props) => {
     )
 }
 
-
 function mapStateToProps(state, prop) {
     return {
         questionData: state.questionData
     }
 }
-
 
 export default connect(mapStateToProps)(Question);
