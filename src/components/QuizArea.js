@@ -19,12 +19,32 @@ class QuizArea extends Component {
         this.getTheQuestion = this.getTheQuestion.bind(this);
         this.handleGameOver = this.handleGameOver.bind(this);
         this.startNewGame = this.startNewGame.bind(this);
+        this.resetTime = this.resetTime.bind(this);
         this.countDown = this.countDown.bind(this);
     }
 
     componentDidMount() {
         this.getTheQuestion();
         this.interval = setInterval(this.countDown, 1000);
+    }
+
+    getTheQuestion() {
+        const { action, alreadyAsked } = this.props;
+        fetch("http://jservice.io/api/random").then(res => {
+            res.json().then(data => {
+                console.log(data[0]);
+                //checking if the question was already asked, or if there is an empty question (happens sometimes), or if there was any problem with the response
+                if(alreadyAsked.indexOf(data[0].id) > -1 ||
+                data[0].question.length === 0 || res.status !== 200) {
+                    this.getTheQuestion();
+                }
+                else {
+                    action.setQuestion(data[0]);
+                    action.addAlreadyAsked(data[0].id);
+                    this.setState({secondsLeft: 30});
+                }
+            })
+        })
     }
 
     countDown() {
@@ -36,22 +56,8 @@ class QuizArea extends Component {
         }
     }
 
-    getTheQuestion() {
-        const { action, alreadyAsked } = this.props;
-        fetch("http://jservice.io/api/random").then(res => {
-            res.json().then(data => {
-                console.log(data[0]);
-                //checking if the question was already asked and if there was any problem with the response
-                if(alreadyAsked.indexOf(data[0].id) > -1 || res.status !== 200) {
-                    this.getTheQuestion();
-                }
-                else {
-                    action.setQuestion(data[0]);
-                    action.addAlreadyAsked(data[0].id);
-                    this.setState({secondsLeft: 30});
-                }
-            })
-        })
+    resetTime() {
+        this.setState({secondsLeft: 30});
     }
 
     handleGameOver() {
@@ -78,11 +84,14 @@ class QuizArea extends Component {
      return (
        <div className="quiz-area">
          {gameOver ?
-         <GameOverModal startNewGame={this.startNewGame}/> : null}
+         <GameOverModal startNewGame={this.startNewGame}/>
+         : null}
          <GeneralInfo/>
          <div className="timer-circle">{secondsLeft}</div>
-         <Question/>
-         <AnswerArea getTheQuestion={this.getTheQuestion} handleGameOver={this.handleGameOver}/>
+         <Question resetTime={this.resetTime}/>
+         <AnswerArea
+         getTheQuestion={this.getTheQuestion}
+         handleGameOver={this.handleGameOver}/>
        </div>
     );
   }

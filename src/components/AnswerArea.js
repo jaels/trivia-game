@@ -30,6 +30,7 @@ class AnswerArea extends Component {
                 this.props.action.setWrongAnswer();
                 this.props.handleGameOver();
             }
+            this.setState({userAnswer: ""});
             this.answerArea.current.value = "";
         }
     }
@@ -51,7 +52,10 @@ class AnswerArea extends Component {
     render() {
         return (
             <div>
-                <textarea rows="4" cols="50" className="answer-area" onChange={this.handleAnswerTyping.bind(this)} ref={this.answerArea}>
+                <textarea rows="4" cols="50"
+                    className="answer-area"
+                    onChange={this.handleAnswerTyping.bind(this)}
+                    ref={this.answerArea}>
                 </textarea>
                 <button className="submit-button" onClick={this.handleSubmitAnswer.bind(this)}>Submit</button>
             </div>

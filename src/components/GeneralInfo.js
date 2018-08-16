@@ -5,7 +5,9 @@ import {connect} from "react-redux";
 const GeneralInfo = (props) => {
     return (
       <div className="general-info-area">
-          {localStorage.getItem("highScore") ? <h2>Your Highest Score: {localStorage.getItem("highScore")}</h2> : null}
+          {localStorage.getItem("highScore") ?
+              <h2>Your Highest Score: {localStorage.getItem("highScore")}</h2>
+              : null}
           <h2>Round: {props.round}</h2>
           <h2> Total Score: {props.generalScore} </h2>
           <h2> Current Round Score: {props.currentRoundScore}</h2>
