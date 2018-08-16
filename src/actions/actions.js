@@ -1,5 +1,10 @@
 
 
+export var setQuestion = (item) => ({
+    type: "SET_QUESTION",
+    item
+})
+
 export var addAlreadyAsked = (item) => ({
     type: "ADD_ONE",
     item
@@ -19,6 +24,13 @@ export var increasePotentialScore = (item) => ({
     item
 })
 
+export var setWin = () => ({
+    type: "SET_WIN"
+})
+
+export var setWrongAnswer = () => ({
+    type: "SET_WRONG_ANSWER"
+})
 
 export var newGame = () => ({
     type: "NEW_GAME"
