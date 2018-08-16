@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import '../styles/App.css';
-import Timer from "./Timer";
 import GameOverModal from "./GameOverModal";
 import GeneralInfo from "./GeneralInfo";
 
@@ -16,18 +15,23 @@ class QuizArea extends Component {
             userAnswer: "",
             gameOver: false,
             youWon: false,
-            secondsLeft: 30,
-            maxNumOfQuestions: 30
+            secondsLeft: 0,
+            maxNumOfRounds: 30
         }
 
         this.answerArea = React.createRef();
         this.handleGameOver = this.handleGameOver.bind(this);
         this.handleCorrectAnswer = this.handleCorrectAnswer.bind(this);
+        this.countDown = this.countDown.bind(this);
         this.startNewGame = this.startNewGame.bind(this);
+
+        // localStorage.setItem("highScore", 0);
+        // localStorage.clear();
     }
 
     componentDidMount() {
         this.getTheQuestion();
+        this.interval = setInterval(this.countDown, 1000);
     }
 
     getTheQuestion() {
@@ -66,14 +70,13 @@ class QuizArea extends Component {
 
     handleCorrectAnswer() {
         const { action, round, currentRoundScore } = this.props;
-        const { maxNumOfQuestions } = this.state;
+        const { maxNumOfRounds } = this.state;
         action.addScore(currentRoundScore);
-        if (round < maxNumOfQuestions) {
+        if (round < maxNumOfRounds) {
+            this.getTheQuestion();
             action.nextRound();
             action.increasePotentialScore(Math.pow(2, round));
             this.answerArea.current.value = "";
-            this.getTheQuestion();
-            this.setState({secondsLeft: 30});
         }
         else {
             this.setState({youWon: true});
@@ -81,35 +84,43 @@ class QuizArea extends Component {
         }
     }
 
-
+    countDown() {
+        const { secondsLeft } = this.state;
+        this.setState({secondsLeft: secondsLeft -1});
+        if (secondsLeft === 1) {
+          this.setState({gameOver: true});
+          clearInterval(this.interval);
+        }
+    }
 
     handleGameOver() {
-        const { generalScore, currentRoundScore } = this.props;
+        const { generalScore } = this.props;
         this.setState({gameOver: true});
+        clearInterval(this.interval);
         if(!localStorage.getItem("highScore")) {
-            localStorage.setItem("highScore", generalScore + currentRoundScore);
+            localStorage.setItem("highScore", generalScore);
         }
-        else if (localStorage.getItem("highScore") < generalScore + currentRoundScore) {
-            localStorage.setItem("highScore", generalScore + currentRoundScore);
+        else if (localStorage.getItem("highScore") < generalScore) {
+            localStorage.setItem("highScore", generalScore);
         }
     }
 
     startNewGame() {
         const { action } = this.props;
         action.newGame();
-        this.setState({gameOver: false, secondsLeft: 30});
+        this.setState({gameOver: false, youWon: false, secondsLeft: 30});
         this.answerArea.current.value = "";
+        this.interval = setInterval(this.countDown, 1000);
     }
 
   render() {
-     const { questionData, gameOver, youWon } = this.state;
+     const { questionData, gameOver, youWon, secondsLeft } = this.state;
      return (
        <div className="questionArea">
          {gameOver ?
-         <GameOverModal youWon={youWon} startNewGame={this.startNewGame}/> : ""}
+         <GameOverModal youWon={youWon} startNewGame={this.startNewGame}/> : null}
          <GeneralInfo/>
-         {!gameOver ?
-         <Timer handleGameOver={this.handleGameOver} secondsLeft={this.state.secondsLeft}/> : null}
+         <div className="timer-circle">{secondsLeft}</div>
          <h2 className="question">Please answer the following question:</h2>
          <h3>{questionData ? questionData.category.title : "" }</h3>
          <h2>{questionData ? questionData.question : ""}</h2>

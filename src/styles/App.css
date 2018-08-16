@@ -43,8 +43,8 @@ body {
     display: block;
     margin: 30px auto;
     cursor: pointer;
-    background-color: #F5F4FF;
-    color: #0D1D37;
+    background-color: #0D1D37;
+    color: #F5F4FF;
     border-radius: 70px;
     height: 50px;
     width: 200px;
@@ -52,10 +52,9 @@ body {
 }
 
 .submit-button:hover {
-    background-color: #0D1D37;
-    color: #F5F4FF;
+    background-color: #F5F4FF;
+    color: #0D1D37;
 }
-
 
 .modal {
     position: fixed;
