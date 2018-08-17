@@ -19,7 +19,6 @@ class QuizArea extends Component {
         this.getTheQuestion = this.getTheQuestion.bind(this);
         this.handleGameOver = this.handleGameOver.bind(this);
         this.startNewGame = this.startNewGame.bind(this);
-        this.resetTime = this.resetTime.bind(this);
         this.countDown = this.countDown.bind(this);
     }
 
@@ -56,10 +55,6 @@ class QuizArea extends Component {
         }
     }
 
-    resetTime() {
-        this.setState({secondsLeft: 30});
-    }
-
     handleGameOver() {
         const { generalScore } = this.props;
         this.setState({gameOver: true});
@@ -88,7 +83,7 @@ class QuizArea extends Component {
          : null}
          <GeneralInfo/>
          <div className="timer-circle">{secondsLeft}</div>
-         <Question resetTime={this.resetTime}/>
+         <Question/>
          <AnswerArea
          getTheQuestion={this.getTheQuestion}
          handleGameOver={this.handleGameOver}/>
